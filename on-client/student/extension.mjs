@@ -93,7 +93,58 @@ export function createStudentView() {
 
       return root;
     },
-    renderDecision() { return '학생 구현 대기: 서버의 판정과 이유를 연결하세요.'; },
+    renderDecision({ status, mode, data, error, appId } = {}) {
+      const root = document.createElement('div');
+      const addText = (tag, text) => {
+        const node = document.createElement(tag);
+        node.textContent = String(text);
+        root.append(node);
+        return node;
+      };
+      const valueText = (value) => typeof value === 'string' && value.length > 0 ? value : '확인 불가';
+      const addAppId = (value, label = '업무 앱 ID') => {
+        if (typeof value === 'string' && value.length > 0) addText('p', `${label}: ${value}`);
+      };
+      const decisionLabels = {
+        allow: '접근 허용(allow)',
+        deny: '접근 거부(deny)',
+        challenge: '추가 인증 또는 확인 필요(challenge)',
+        unknown: '확인 불가(unknown)',
+      };
+
+      if (status === 'idle') {
+        addText('p', '앱을 골라 접속을 요청하세요.');
+        addAppId(appId, '선택한 앱 ID');
+      } else if (status === 'loading') {
+        addText('p', '판정 확인 중');
+        addAppId(appId, '요청한 앱 ID');
+      } else if (status === 'error') {
+        const message = typeof error?.message === 'string' && error.message.length > 0
+          ? error.message
+          : '오류 메시지를 확인할 수 없습니다.';
+        addText('p', `요청 실패: ${message}`);
+        addText('p', '요청 실패는 접근 거부 판정이 아닙니다.');
+        addAppId(appId, '요청한 앱 ID');
+      } else if (status === 'ok') {
+        const knownDecision = typeof data?.decision === 'string' && Object.hasOwn(decisionLabels, data.decision);
+        const decisionText = knownDecision ? decisionLabels[data.decision] : decisionLabels.unknown;
+        addText('p', `접근 판정: ${decisionText}`);
+        const resultAppId = typeof data?.appId === 'string' && data.appId.length > 0 ? data.appId : appId;
+        addAppId(resultAppId, '판정 앱 ID');
+        addText('p', `판정 이유: ${valueText(data?.reason)}`);
+        addText('p', `판정 시각: ${valueText(data?.checkedAt)}`);
+        if (knownDecision && data.decision === 'allow') {
+          addText('p', '정책상 접근 허용이며 실제 앱 접속 성공을 보장하지 않습니다.');
+        } else if (knownDecision && data.decision === 'challenge') {
+          addText('p', '이 앱은 추가 확인 절차를 대신 수행하지 않습니다.');
+        }
+      } else {
+        addText('p', '판정 상태를 확인할 수 없습니다.');
+        addAppId(appId);
+      }
+
+      return root;
+    },
     renderEvents() { return '학생 구현 대기: 본인 접속·XDR 기록을 연결하세요.'; },
     renderStatus() { return '학생 구현 대기: 기기·세션·알림과 연결 점검 상태를 구분하세요.'; },
     renderVulnerabilities() { return '학생 구현 대기: 정확한 설치 버전·OSV 출처·조회 시각·부분 결과·조회 실패를 구분하세요.'; },
