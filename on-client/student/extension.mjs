@@ -576,9 +576,9 @@ export function createStudentView() {
       const safeCodeGuidance = {
         ON_AI_PROVISIONING_PENDING: '권한 준비 중 또는 확인 불가입니다. 담당자에게 계정 연결과 앱 권한을 확인해 주세요.',
         ON_AI_TRANSPORT_PENDING: 'AI 연결 경로를 확인할 수 없습니다. 담당자에게 확인해 주세요.',
-        WB_CLCO_AUTH_REQUIRED: '인증 실패입니다. 계정 연결과 앱 승인을 다시 확인하고, 계속되면 담당자에게 문의해 주세요.',
-        WB_CLCO_INVALID_TOKEN: '인증 정보를 확인할 수 없습니다. 비밀값을 복사하지 말고 담당자에게 문의해 주세요.',
-        WB_CLCO_ACCESS_BLOCKED: '접근이 제한됐습니다. 학생 앱 이용 권한을 담당자에게 확인해 주세요.',
+        WB_CLCO_AUTH_REQUIRED: '인증 실패입니다. 계정 연결을 다시 확인하고, 계속되면 담당자에게 문의해 주세요.',
+        WB_CLCO_INVALID_TOKEN: '인증 정보를 확인할 수 없습니다. 비밀값을 복사하지 말고 계정 연결을 다시 확인한 뒤, 계속되면 담당자에게 문의해 주세요.',
+        WB_CLCO_ACCESS_BLOCKED: '접근이 제한됐습니다. 계정 연결을 다시 확인하고, 앱 이용 권한을 담당자에게 확인해 주세요.',
         WB_CLCO_COHORT_BUDGET_EXHAUSTED: '반 사용량 한도에 도달했습니다. 담당자에게 확인해 주세요.',
         WB_CLCO_LIMIT_REACHED: '이용 한도에 도달했습니다. 담당자에게 확인해 주세요.',
         WB_CLCO_RATE_LIMITED: '요청이 제한됐습니다. 잠시 뒤 직접 다시 점검해 주세요.',
@@ -624,6 +624,7 @@ export function createStudentView() {
       } else if (status === 'error') {
         addText('p', `AI 연결 점검 실패 · 오류 코드: ${safeCode}`);
         addText('p', `오류 안내: ${safeMessage}`);
+        addText('p', `코드별 후속 안내: ${safeCodeGuidance[safeCode]}`);
         addText('p', '이 점검 실패는 업무 앱 판정이나 보안 기록의 실패를 뜻하지 않습니다. 다시 점검하려면 제공 화면의 버튼을 직접 누르세요.');
       } else if (status === 'ok') {
         const validAuthorization = data?.audienceAuthorization === 'test' || data?.audienceAuthorization === 'verified';
